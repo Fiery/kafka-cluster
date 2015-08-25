@@ -16,7 +16,7 @@
 # vi: set ft=ruby :
 
 $num_brokers = 4
-$num_keepers = 5
+$num_keepers = 3
 $broker_name_prefix = 'broker'
 $keeper_name_prefix = 'keeper'
 # Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
@@ -83,19 +83,18 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       config.vm.provider :docker do |node|
         node.build_dir = "./kafka-docker"
         node.name = "#{vm_name}-docker"
-        #node.has_ssh = true
+        node.has_ssh = true
         node.vagrant_vagrantfile = "./coreos/Vagrantfile"
         node.vagrant_machine = "core-%02d" % [$num_keepers+i]
         #node.link("zookeeper-docker:zk")
         node.env ={ "KAFKA_ADVERTISED_HOST_NAME"=>"172.17.8.#{$num_keepers+i+100}" % [101+i],
                     "KAFKA_HEAP_OPTS"=>"-Xmx2G -Xms1G",
-                    "KAFKA_ZOOKEEPER_CONNECT"=>"172.17.8.101:2181",
+                    "KAFKA_ZOOKEEPER_CONNECT"=>(1..$num_keepers).map {|n| "172.17.8.#{100+n}:2181"}.join(','),
                     "KAFKA_BROKER_ID"=>"#{i}"
                   }
         node.ports = ['9092:9092']
         node.volumes = ['/var/run/docker.sock:/var/run/docker.sock']#,'/vagrant:/vagrant']
       end
-
       ###
       #  All other host configuration ignored when using external vagrantfile as host
       #
