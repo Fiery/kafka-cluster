@@ -12,7 +12,7 @@ sed -i -r 's|#autopurge|autopurge|g' $ZK_HOME/conf/zoo.cfg
 
 
 if [ -n "$ZK_NODES" ] ; then
-	export count=1
+	count=1
 	for node in $ZK_NODES
 	do
 		if [ "$ZK_ID" -eq "$count" ]; then
@@ -27,7 +27,6 @@ if [ -n "$ZK_NODES" ] ; then
 		#fi
 		count=$(($count+1))
 	done
-	unset count
 fi
 
 #echo "CONFIG DONE"
